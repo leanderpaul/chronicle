@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ES6",
+
+    "module": "CommonJS",
+
+    "noEmit": false,
+    "outDir": "build",
+
+    "isolatedModules": false
+  },
+  "include": ["index.ts", "src/**/*.ts"],
+  "exclude": ["app", "pages"]
+}
