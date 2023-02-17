@@ -38,8 +38,8 @@ app.use(Context.init());
 
 /** Middleware to handle authentication */
 app.use(async (req, _res, next) => {
-  const url = req.path;
-  if (url === '/api/status' || url === '/api/set-cookie') return next();
+  logger.debug(`url - ${req.url}`);
+  if (req.path === '/api/status' || req.path === '/api/set-cookie') return next();
 
   const user = await Library.user.getUserFromCookie();
   const metadata = await Library.metadata.findByUID(user.uid);

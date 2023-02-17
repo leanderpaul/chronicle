@@ -5,6 +5,7 @@
 /**
  * Importing npm design components.
  */
+// import { Context } from '@server/utils/constants';
 
 /**
  * Importing user defined components.
@@ -17,6 +18,7 @@
 /**
  * Importing styled components.
  */
+import './global.css';
 
 /**
  * Importing types.
@@ -25,7 +27,7 @@ interface ILayoutProps {
   children: React.ReactNode;
 }
 
-function Layout(props: ILayoutProps) {
+async function Layout(props: ILayoutProps) {
   return (
     <html lang='en'>
       <head />

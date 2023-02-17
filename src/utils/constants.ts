@@ -1,6 +1,8 @@
 /**
  * Importing npm packages.
  */
+import sagus from 'sagus';
+import { AsyncLocalStorage } from 'async_hooks';
 
 /**
  * Importing user defined packages.
@@ -9,6 +11,8 @@
 /**
  * Importing and defining types.
  */
+import type { RequestHandler, Request, Response } from 'express';
+import type { IUser, IUserSession, IMetadata } from '@server/lib';
 
 /**
  * Declaring the constants.
@@ -52,3 +56,52 @@ export class HTTPError extends Error {
     return this.statusCode;
   }
 }
+
+/**************************************** Request Context ****************************************/
+
+const asyncLocalStorage = new AsyncLocalStorage<Map<string, any>>();
+
+export const Context = {
+  init(): RequestHandler {
+    return (req, res, next) => {
+      asyncLocalStorage.run(new Map(), () => {
+        const store = asyncLocalStorage.getStore()!;
+        store.set('RID', sagus.genUUID());
+        store.set('CURRENT_REQUEST', req);
+        store.set('CURRENT_RESPONSE', res);
+        return next();
+      });
+    };
+  },
+
+  getRID(): string {
+    return asyncLocalStorage.getStore()!.get('RID');
+  },
+
+  getCurrentRequest(): Request {
+    return asyncLocalStorage.getStore()!.get('CURRENT_REQUEST');
+  },
+
+  getCurrentResponse(): Response {
+    return asyncLocalStorage.getStore()!.get('CURRENT_RESPONSE');
+  },
+
+  getCurrentUser(): IUser & { metadata: IMetadata } {
+    return asyncLocalStorage.getStore()!.get('CURRENT_USER');
+  },
+
+  setCurrentUser(user: IUser, metadata: IMetadata) {
+    const obj = { ...user, metadata };
+    asyncLocalStorage.getStore()!.set('CURRENT_USER', obj);
+  },
+
+  getCurrentSession(): IUserSession {
+    return asyncLocalStorage.getStore()!.get('CURRENT_USER_SESSION');
+  },
+
+  setCurrentSession(session: IUserSession) {
+    asyncLocalStorage.getStore()!.set('CURRENT_USER_SESSION', session);
+  },
+};
+
+global.getRID = () => asyncLocalStorage.getStore()?.get('RID') ?? null;

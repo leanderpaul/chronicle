@@ -10,7 +10,7 @@ import { AsyncLocalStorage } from 'async_hooks';
  * Importing user defined packages.
  */
 import { calculateTotal } from './helpers';
-import { SECRET_KEY, AppError, AUTH, SERVICE_NAME, HTTPError } from './constants';
+import { SECRET_KEY, AppError, AUTH, SERVICE_NAME, HTTPError, Context } from './constants';
 
 /**
  * Importing and defining types.
@@ -21,7 +21,7 @@ import type { IUser, IUserSession, IMetadata } from '@server/lib';
 
 const logger = global.getLogger('utils:index');
 
-export { SECRET_KEY, AppError, calculateTotal, AUTH, SERVICE_NAME, HTTPError };
+export { SECRET_KEY, AppError, calculateTotal, AUTH, SERVICE_NAME, HTTPError, Context };
 
 /****************************************** Validators *******************************************/
 
@@ -58,52 +58,52 @@ export const Crypto = {
 
 /**************************************** Request Context ****************************************/
 
-const asyncLocalStorage = new AsyncLocalStorage<Map<string, any>>();
+// const asyncLocalStorage = new AsyncLocalStorage<Map<string, any>>();
 
-export const Context = {
-  init(): RequestHandler {
-    return (req, res, next) => {
-      asyncLocalStorage.run(new Map(), () => {
-        const store = asyncLocalStorage.getStore()!;
-        store.set('RID', sagus.genUUID());
-        store.set('CURRENT_REQUEST', req);
-        store.set('CURRENT_RESPONSE', res);
-        return next();
-      });
-    };
-  },
+// export const Context = {
+//   init(): RequestHandler {
+//     return (req, res, next) => {
+//       asyncLocalStorage.run(new Map(), () => {
+//         const store = asyncLocalStorage.getStore()!;
+//         store.set('RID', sagus.genUUID());
+//         store.set('CURRENT_REQUEST', req);
+//         store.set('CURRENT_RESPONSE', res);
+//         return next();
+//       });
+//     };
+//   },
 
-  getRID(): string {
-    return asyncLocalStorage.getStore()!.get('RID');
-  },
+//   getRID(): string {
+//     return asyncLocalStorage.getStore()!.get('RID');
+//   },
 
-  getCurrentRequest(): Request {
-    return asyncLocalStorage.getStore()!.get('CURRENT_REQUEST');
-  },
+//   getCurrentRequest(): Request {
+//     return asyncLocalStorage.getStore()!.get('CURRENT_REQUEST');
+//   },
 
-  getCurrentResponse(): Response {
-    return asyncLocalStorage.getStore()!.get('CURRENT_RESPONSE');
-  },
+//   getCurrentResponse(): Response {
+//     return asyncLocalStorage.getStore()!.get('CURRENT_RESPONSE');
+//   },
 
-  getCurrentUser(): IUser & { metadata: IMetadata } {
-    return asyncLocalStorage.getStore()!.get('CURRENT_USER');
-  },
+//   getCurrentUser(): IUser & { metadata: IMetadata } {
+//     return asyncLocalStorage.getStore()!.get('CURRENT_USER');
+//   },
 
-  setCurrentUser(user: IUser, metadata: IMetadata) {
-    const obj = { ...user, metadata };
-    asyncLocalStorage.getStore()!.set('CURRENT_USER', obj);
-  },
+//   setCurrentUser(user: IUser, metadata: IMetadata) {
+//     const obj = { ...user, metadata };
+//     asyncLocalStorage.getStore()!.set('CURRENT_USER', obj);
+//   },
 
-  getCurrentSession(): IUserSession {
-    return asyncLocalStorage.getStore()!.get('CURRENT_USER_SESSION');
-  },
+//   getCurrentSession(): IUserSession {
+//     return asyncLocalStorage.getStore()!.get('CURRENT_USER_SESSION');
+//   },
 
-  setCurrentSession(session: IUserSession) {
-    asyncLocalStorage.getStore()!.set('CURRENT_USER_SESSION', session);
-  },
-};
+//   setCurrentSession(session: IUserSession) {
+//     asyncLocalStorage.getStore()!.set('CURRENT_USER_SESSION', session);
+//   },
+// };
 
-global.getRID = () => asyncLocalStorage.getStore()?.get('RID') ?? null;
+// global.getRID = () => asyncLocalStorage.getStore()?.get('RID') ?? null;
 
 /********************************************* Utils *********************************************/
 
